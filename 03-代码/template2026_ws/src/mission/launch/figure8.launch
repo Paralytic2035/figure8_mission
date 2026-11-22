@@ -1,0 +1,8 @@
+<launch>
+  <!-- figure8：∞ 双纽线自编动作 -->
+  <!-- if_debug: 0 = 等飞手拨 SwD 切 OFFBOARD（现场用）；1 = 程序自动切（仅仿真用） -->
+  <arg name="if_debug" default="0"/>
+  <rosparam command="load" file="$(find mission)/config/figure8.yaml" />
+  <param name="if_debug" type="double" value="$(arg if_debug)"/>
+  <node pkg="mission" type="figure8" name="figure8" output="screen" />
+</launch>

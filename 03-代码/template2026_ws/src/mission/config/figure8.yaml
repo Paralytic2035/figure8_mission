@@ -1,0 +1,37 @@
+# ============ figure8 自编动作（∞ 双纽线）参数 ============
+# 与 square.yaml 同一套约定：坐标相对起飞原点，ENU 数值，mavros 转 NED。
+
+# ---- 曲线 ----
+# bernoulli：曲率处处连续，自交点正好落在起飞点，推荐
+# gerono   ：有尖角（R_min≈0.10 m），只用于对照实验
+curve: bernoulli
+curve_a: 0.75         # 半长轴 [m] → x 幅值 ±0.75（11-19 实机目测 0.45 偏小）
+curve_y_scale: 1.41   # y 拉伸 → y 幅值 ±0.25（纵横 2:1）
+altitude: 0.8         # 相对起飞点高度 [m]
+
+# ---- 速度与跟踪 ----
+v_max: 0.22           # 最大弧长速度 [m/s]（timed 模式下等于参考点速度；放慢求稳）
+v_min: 0.18           # 最小弧长速度 [m/s]
+a_lat_max: 1.2        # 曲率限速用横向加速度上限 [m/s²]
+k_ct: 1.5             # 横向纠偏增益（仅 ctrl_mode: vel 生效）
+k_gate: 0.45          # 进度门控裕度 [m]（仿真实测：0.15→0.12 m/s，0.45→0.32 m/s）
+track_mode: timed     # timed：纯时间推进（11-19 实机验证用；progress 曾出现门控死锁）
+# ctrl_mode: pos_ff=位置+速度前馈（会外鼓）| pos=纯位置（仿真最优）| vel=xy 纯速度
+ctrl_mode: pos        # 2026-11-18 四轮仿真实测，pos 最准（RMSE 0.044 / 幅值 95%）
+
+# ---- 圈数与机头 ----
+laps: 3               # 圈数
+yaw_mode: fixed       # fixed（已实飞验证）| sweep（未实飞）| tangent（仅实验）
+yaw_sweep_amp: 0.25   # sweep 幅度 [rad] ≈ ±14°
+yaw_rate_max: 0.8     # yaw 指令变化率上限 [rad/s]
+
+# ---- 安全 ----
+err_max: 0.15         # 到点判据（起飞点 / 回原点）
+dev_max: 0.30         # 横向偏差上限 [m]，超限即冻结悬停
+dev_time: 0.5         # 超限持续多久触发 [s]
+timeout_scale: 2.0    # 总时长上限 = scale × 名义时长
+
+# ---- 可选 ----
+z_amp: 0.0            # >0 叠加 z 起伏（三维 ∞），如 0.08
+csv: true             # 跟踪数据落盘 ~/.ros/fig8-*.csv
+if_debug: 0           # 0：等飞手拨 SwD 切 OFFBOARD；1：程序自动切（仅仿真）
